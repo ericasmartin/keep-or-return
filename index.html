@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Keep or Return?</title>
+<style>
+  @font-face {
+    font-family: 'Monument Mono';
+    src: url('/fonts/ABCMonumentGroteskMono-Light-Trial.woff2') format('woff2');
+    font-weight: 300;
+  }
+  @font-face {
+    font-family: 'Monument Mono';
+    src: url('/fonts/ABCMonumentGroteskMono-Regular-Trial.woff2') format('woff2');
+    font-weight: 400;
+  }
+  @font-face {
+    font-family: 'Monument Mono';
+    src: url('/fonts/ABCMonumentGroteskMono-Medium-Trial.woff2') format('woff2');
+    font-weight: 500;
+  }
+  @font-face {
+    font-family: 'Monument Mono';
+    src: url('/fonts/ABCMonumentGroteskMono-Bold-Trial.woff2') format('woff2');
+    font-weight: 700;
+  }
+  @font-face {
+    font-family: 'Monument Grotesk';
+    src: url('/fonts/ABCMonumentGrotesk-Regular-Trial.woff2') format('woff2');
+    font-weight: 400;
+  }
+  @font-face {
+    font-family: 'Monument Grotesk';
+    src: url('/fonts/ABCMonumentGrotesk-Medium-Trial.woff2') format('woff2');
+    font-weight: 500;
+  }
+  @font-face {
+    font-family: 'Monument Grotesk';
+    src: url('/fonts/ABCMonumentGrotesk-Bold-Trial.woff2') format('woff2');
+    font-weight: 700;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --mono: 'Monument Mono', 'SF Mono', 'Courier New', monospace;
+    --sans: 'Monument Grotesk', system-ui, sans-serif;
+    --green: #00C853;
+    --red: #FF1744;
+    --yellow: #FFD600;
+  }
+
+  body {
+    font-family: var(--mono);
+    background: #111111;
+    color: #1a1a1a;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 40px 20px 200px;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .container {
+    max-width: 360px;
+    width: 100%;
+  }
+
+
+  /* Receipt */
+  .receipt {
+    background: #ffffff;
+    padding: 40px 24px 20px;
+    position: relative;
+    overflow: visible;
+    filter: drop-shadow(0 1px 3px rgba(0,0,0,0.08)) drop-shadow(0 4px 12px rgba(0,0,0,0.1))
+            url(#paper-crinkle);
+  }
+
+  /* Paper grain texture overlay */
+  .receipt::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='5' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.09'/%3E%3C/svg%3E");
+    background-size: 180px 180px;
+    pointer-events: none;
+    z-index: 1;
+    mix-blend-mode: multiply;
+  }
+
+  .receipt > * { position: relative; z-index: 2; }
+
+  /* Sun-faded effect — uneven text fade */
+  .receipt .receipt-fade {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      155deg,
+      transparent 0%,
+      transparent 30%,
+      rgba(255,255,255,0.15) 45%,
+      rgba(255,255,255,0.22) 55%,
+      rgba(255,255,255,0.1) 68%,
+      transparent 80%,
+      transparent 100%
+    );
+    pointer-events: none;
+    z-index: 3;
+    mix-blend-mode: lighten;
+  }
+
+  /* Zigzag torn bottom edge */
+  .receipt::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 0;
+    right: 0;
+    height: 10px;
+    background:
+      linear-gradient(45deg, transparent 50%, #ffffff 50%),
+      linear-gradient(-45deg, transparent 50%, #ffffff 50%);
+    background-size: 10px 100%;
+    z-index: 0;
+  }
+
+  /* Title */
+  .receipt-title {
+    font-family: var(--sans);
+    font-size: 30px;
+    font-weight: 700;
+    text-align: center;
+    line-height: 1;
+    margin-bottom: 40px;
+    letter-spacing: -0.5px;
+  }
+
+  /* Dashed divider */
+  .dashed {
+    border: none;
+    height: 1.5px;
+    margin: 12px 0;
+    position: relative;
+    background-image: repeating-linear-gradient(to right, #1a1a1a 0, #1a1a1a 6px, transparent 6px, transparent 9px);
+  }
+
+  .dashed.with-scissors {
+    overflow: visible;
+  }
+  .dashed.with-scissors::before {
+    content: '✂';
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    left: -4px;
+    font-size: 28px;
+    color: #1a1a1a;
+    background: #ffffff;
+    padding-right: 6px;
+    line-height: 1;
+    z-index: 1;
+  }
+
+  /* Input on the receipt */
+  .receipt-input textarea {
+    width: 100%;
+    padding: 8px 0 0;
+    font-size: 12px;
+    font-family: var(--mono);
+    font-weight: 400;
+    border: none;
+    background: transparent;
+    color: #949494;
+    outline: none;
+    min-height: 38px;
+    resize: none;
+    overflow: hidden;
+    line-height: 1.5;
+  }
+
+  .receipt-input textarea::placeholder {
+    color: #bbb;
+  }
+
+  .receipt-input textarea {
+    transition: color 0.8s ease 0.4s;
+  }
+
+  .receipt-input textarea.detected {
+    color: #1a1a1a;
+  }
+
+  .input-hint {
+    font-size: 9px;
+    font-weight: 400;
+    color: #bbb;
+    min-height: 0;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-top: 2px;
+  }
+
+  /* Results area */
+  .receipt-results {
+    display: none;
+    position: relative;
+  }
+
+  .receipt-results.visible {
+    display: block;
+  }
+
+  .receipt-results.ripping {
+    display: block;
+    animation: ripResults 0.5s cubic-bezier(0.4, 0, 1, 1) forwards;
+  }
+
+  @keyframes ripResults {
+    0% { opacity: 1; transform: translateY(0); }
+    100% { opacity: 0; transform: translateY(40px); }
+  }
+
+  /* Receipt lines */
+  .receipt-line {
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 1.8;
+    opacity: 0;
+    overflow: hidden;
+  }
+
+  .receipt-line.typed {
+    animation: show 0.05s steps(1) forwards;
+  }
+
+  @keyframes show {
+    to { opacity: 1; }
+  }
+
+  /* Row: label on left, value on right, dots filling */
+  .receipt-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 2.4;
+    opacity: 0;
+    overflow: hidden;
+  }
+
+  .receipt-row.typed {
+    animation: show 0.05s steps(1) forwards;
+  }
+
+  .receipt-row .row-label {
+    flex-shrink: 0;
+  }
+
+  .receipt-row .row-dots {
+    flex: 1;
+    border-bottom: 1px dotted #ccc;
+    margin: 0 6px;
+    height: 1em;
+  }
+
+  .receipt-row .row-value {
+    flex-shrink: 0;
+    text-align: right;
+  }
+
+  .receipt-row.verdict-row {
+    font-size: 14px;
+    font-weight: 700;
+  }
+
+  /* Centered text */
+  .receipt-line.center { text-align: center; }
+
+  .receipt-line.title-line {
+    font-size: 12px;
+    font-weight: 700;
+    text-align: center;
+    text-transform: uppercase;
+  }
+
+  .receipt-line.desc-line {
+    font-size: 12px;
+    color: #999;
+    text-align: left;
+    line-height: 1.5;
+    white-space: normal;
+  }
+
+  .receipt-line.verdict-text {
+    font-family: var(--sans);
+    font-size: 28px;
+    font-weight: 700;
+    text-align: center;
+    margin: 4px 0;
+    letter-spacing: -0.5px;
+  }
+
+  .receipt-line.verdict-text.keep { color: var(--green); }
+  .receipt-line.verdict-text.return { color: var(--red); }
+  .receipt-line.verdict-text.sleep_on_it { color: var(--yellow); }
+
+  .receipt-line.small {
+    font-size: 12px;
+    color: #949494;
+    text-align: center;
+    letter-spacing: 0.5px;
+  }
+
+  .receipt-line.footer {
+    font-size: 12px;
+    color: #949494;
+    text-align: center;
+    letter-spacing: 0.5px;
+  }
+
+  /* Product image */
+  .receipt-image-wrap {
+    text-align: center;
+    margin: 8px 0;
+    opacity: 0;
+  }
+
+  .receipt-image-wrap.typed {
+    animation: show 0.05s steps(1) forwards;
+  }
+
+  .receipt-image {
+    width: 110px;
+    height: 110px;
+    object-fit: cover;
+    filter: grayscale(100%) contrast(1.2);
+    mix-blend-mode: multiply;
+  }
+
+  /* Dashed divider in results */
+  .receipt-dashed {
+    border: none;
+    height: 1.5px;
+    margin: 22px 0;
+    position: relative;
+    background-image: repeating-linear-gradient(to right, #1a1a1a 0, #1a1a1a 6px, transparent 6px, transparent 9px);
+    opacity: 0;
+  }
+
+  .receipt-dashed.typed {
+    animation: show 0.05s steps(1) forwards;
+  }
+
+  .receipt-dashed.cut-line {
+    cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Ctext y='18' font-size='18'%3E✂%3C/text%3E%3C/svg%3E") 12 12, pointer;
+    height: 24px;
+    margin: 10px 0;
+    background-position: center;
+    background-size: 100% 1.5px;
+    background-repeat: no-repeat;
+  }
+
+  /* Stamp overlay */
+  .receipt-stamp {
+    position: absolute;
+    top: 130px;
+    left: 50%;
+    transform: translate(-50%, 0) rotate(-18deg) scale(0);
+    font-family: var(--sans);
+    font-size: 96px;
+    font-weight: 700;
+    letter-spacing: -2px;
+    line-height: 0.9;
+    text-align: center;
+    pointer-events: none;
+    opacity: 0;
+    z-index: 10;
+    text-transform: uppercase;
+    white-space: pre-line;
+    /* Worn ink — uneven pressure: dark on one side, faded on other */
+    -webkit-mask-image:
+      linear-gradient(140deg, rgba(0,0,0,1) 0%, rgba(0,0,0,0.9) 30%, rgba(0,0,0,0.4) 70%, rgba(0,0,0,0.15) 100%),
+      url("data:image/svg+xml,%3Csvg viewBox='0 0 300 300' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='s'%3E%3CfeTurbulence type='turbulence' baseFrequency='0.025 0.035' numOctaves='3' seed='4' result='big'/%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.4' numOctaves='2' seed='11' result='fine'/%3E%3CfeMerge result='merged'%3E%3CfeMergeNode in='big'/%3E%3CfeMergeNode in='fine'/%3E%3C/feMerge%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='discrete' tableValues='0 0 0.3 0.7 1 1 0.9 1'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23s)'/%3E%3C/svg%3E");
+    -webkit-mask-size: 100% 100%, 300px 300px;
+    -webkit-mask-composite: source-in;
+    mask-image:
+      linear-gradient(140deg, rgba(0,0,0,1) 0%, rgba(0,0,0,0.9) 30%, rgba(0,0,0,0.4) 70%, rgba(0,0,0,0.15) 100%),
+      url("data:image/svg+xml,%3Csvg viewBox='0 0 300 300' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='s'%3E%3CfeTurbulence type='turbulence' baseFrequency='0.025 0.035' numOctaves='3' seed='4' result='big'/%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.4' numOctaves='2' seed='11' result='fine'/%3E%3CfeMerge result='merged'%3E%3CfeMergeNode in='big'/%3E%3CfeMergeNode in='fine'/%3E%3C/feMerge%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='discrete' tableValues='0 0 0.3 0.7 1 1 0.9 1'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23s)'/%3E%3C/svg%3E");
+    mask-size: 100% 100%, 300px 300px;
+    mask-composite: intersect;
+  }
+
+  .receipt-stamp.visible {
+    animation: stampIn 0.3s cubic-bezier(0.2, 0, 0.2, 1) forwards;
+  }
+
+  @keyframes stampIn {
+    0% {
+      opacity: 0;
+      transform: translate(-50%, 0) rotate(-18deg) scale(1.8);
+    }
+    60% {
+      opacity: 0.85;
+      transform: translate(-50%, 0) rotate(-18deg) scale(0.95);
+    }
+    100% {
+      opacity: 0.85;
+      transform: translate(-50%, 0) rotate(-18deg) scale(1);
+    }
+  }
+
+  .receipt-stamp.keep { color: var(--green); }
+  .receipt-stamp.return { color: var(--red); }
+  .receipt-stamp.sleep_on_it { color: var(--yellow); }
+
+  /* Loading */
+  .loading-text {
+    text-align: center;
+    padding: 12px 0;
+    font-size: 12px;
+    font-weight: 400;
+    color: #949494;
+    text-transform: uppercase;
+    letter-spacing: 0;
+    display: none;
+  }
+
+  .loading-text.visible { display: block; }
+
+  .input-hint.rippable {
+    cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Ctext y='18' font-size='18'%3E✂%3C/text%3E%3C/svg%3E") 12 12, pointer;
+  }
+  .input-hint.rippable:hover { color: #888; }
+
+  /* Fall away — smooth drop with slight drift */
+  @keyframes fallAway {
+    0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+    3% { transform: translateY(-3px) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(150vh) rotate(1deg); opacity: 1; }
+  }
+
+
+  /* When tear handle is shown, hide receipt zigzag (handle provides it) */
+  .receipt.torn-off::after { display: none; }
+  .receipt.torn-off {
+    padding-bottom: 0;
+  }
+
+  /* When actively dragging, show jagged tear on receipt bottom */
+  .receipt.ripping {
+    padding-bottom: 0;
+  }
+  .receipt.ripping::after {
+    display: block !important;
+    bottom: -10px;
+    background:
+      linear-gradient(45deg, transparent 50%, #ffffff 50%),
+      linear-gradient(-45deg, transparent 50%, #ffffff 50%);
+    background-size: 10px 100%;
+  }
+
+</style>
+</head>
+<body>
+
+<!-- SVG filter for paper crinkle displacement -->
+<svg style="position:absolute;width:0;height:0" aria-hidden="true">
+  <defs>
+    <filter id="paper-crinkle" x="0%" y="0%" width="100%" height="100%">
+      <!-- Big dramatic crumples -->
+      <feTurbulence type="turbulence" baseFrequency="0.008 0.006" numOctaves="4" seed="7" result="bigNoise"/>
+      <!-- Medium wrinkles -->
+      <feTurbulence type="turbulence" baseFrequency="0.025 0.02" numOctaves="3" seed="19" result="medNoise"/>
+      <!-- Fine grain -->
+      <feTurbulence type="fractalNoise" baseFrequency="0.05 0.04" numOctaves="4" seed="13" result="fineNoise"/>
+      <feMerge result="combinedNoise">
+        <feMergeNode in="bigNoise"/>
+        <feMergeNode in="medNoise"/>
+        <feMergeNode in="fineNoise"/>
+      </feMerge>
+      <feDiffuseLighting in="combinedNoise" lighting-color="#ffffff" surfaceScale="6" result="light">
+        <feDistantLight azimuth="225" elevation="25"/>
+      </feDiffuseLighting>
+      <feComposite in="SourceGraphic" in2="light" operator="arithmetic" k1="0.45" k2="0.6" k3="0" k4="0"/>
+    </filter>
+  </defs>
+</svg>
+
+
+<div class="container">
+  <div class="receipt" id="receipt">
+    <div class="receipt-fade"></div>
+    <div class="receipt-title">KEEP OR RETURN?</div>
+
+    <div class="dashed"></div>
+
+    <div class="receipt-input">
+      <textarea id="input" placeholder="paste link or describe item"></textarea>
+      <div class="input-hint" id="input-hint"></div>
+    </div>
+
+    <div class="loading-text" id="loading">Printing...</div>
+
+    <div class="receipt-results" id="results">
+      <div class="receipt-stamp" id="stamp"></div>
+    </div>
+  </div>
+
+  <!-- Torn paper chunk that falls away -->
+  <div class="tear-paper" id="tear-paper"></div>
+</div>
+
+<script>
+
+  const inputEl = document.getElementById('input');
+  const hintEl = document.getElementById('input-hint');
+  const loadingEl = document.getElementById('loading');
+  const resultsEl = document.getElementById('results');
+  const stampEl = document.getElementById('stamp');
+  const tearPaperEl = document.getElementById('tear-paper');
+  const receiptEl = document.getElementById('receipt');
+  let canRip = false;
+  let debounceTimer = null;
+  let analyzing = false;
+  let lastAnalyzed = '';
+
+  function buildReceipt(data) {
+    const answers = data.answers || data;
+    const scraped = data.scraped || {};
+    const v = answers.verdict;
+    const items = [];
+
+    // Dashed divider after input (cut line with scissors)
+    items.push({ type: 'dashed', scissors: true, cutLine: true });
+
+    // Product info
+    if (scraped.title) {
+      items.push({ type: 'line', text: scraped.title, cls: 'title-line' });
+    }
+
+    if (scraped.price) {
+      const price = scraped.price.startsWith('$') || scraped.price.startsWith('£') || scraped.price.startsWith('€')
+        ? scraped.price : '$' + scraped.price;
+      items.push({ type: 'line', text: price, cls: 'center' });
+    }
+
+    if (scraped.description) {
+      // Summarize: take first sentence, strip marketing fluff
+      let desc = scraped.description;
+      desc = desc.replace(/^(Shop|Buy|Get|Order|Find|Discover)\s+.*?\.\s*/i, '');
+      const firstSentence = desc.match(/^[^.!]+[.!]/);
+      desc = firstSentence ? firstSentence[0] : desc.substring(0, 80);
+      if (desc.length > 80) desc = desc.substring(0, 77) + '...';
+      desc = desc.trim();
+      if (desc.length > 10) {
+        items.push({ type: 'line', text: desc, cls: 'desc-line' });
+      }
+    }
+
+    if (scraped.image) {
+      items.push({ type: 'image', src: scraped.image });
+    }
+
+    items.push({ type: 'dashed' });
+
+    // Dimensions as rows with dots
+    const dims = [
+      { key: 'cost_per_wear', label: 'COST/WEAR', levels: ['Rarely worn', 'Sometimes', 'Regularly', 'Constantly'] },
+      { key: 'trend_vs_timeless', label: 'TREND', levels: ['Very trendy', 'Somewhat trendy', 'Classic', 'Timeless'] },
+      { key: 'material_quality', label: 'MATERIAL', levels: ['Poor', 'Below avg', 'Good', 'Excellent'] },
+      { key: 'dopamine_vs_love', label: 'IMPULSE', levels: ['Pure impulse', 'Mostly excitement', 'Considered', 'Genuine love'] },
+      { key: 'closet_redundancy', label: 'REDUNDANCY', levels: ['Very unique', 'Distinct', 'Common', 'Redundant'] },
+    ];
+
+    for (const dim of dims) {
+      const r = answers[dim.key];
+      if (!r) continue;
+      const best = Math.round(r.score);
+      const level = dim.levels[best] || '?';
+      items.push({ type: 'row', label: dim.label, value: level });
+    }
+
+    items.push({ type: 'dashed' });
+
+    // Verdict as "TOTAL"
+    if (v) {
+      const labels = { keep: 'KEEP IT', return: 'RETURN IT', sleep_on_it: 'SLEEP ON IT' };
+      const choice = v.choice;
+      const conf = Math.round(v.confidence * 100);
+      const vProbs = v.probabilities || {};
+
+      const keepPct = Math.round((vProbs['keep'] || 0) * 100);
+      const returnPct = Math.round((vProbs['return'] || 0) * 100);
+      const sleepPct = Math.round((vProbs['sleep_on_it'] || 0) * 100);
+
+      // Sort by percentage descending
+      const verdicts = [
+        { label: 'KEEP', pct: keepPct },
+        { label: 'SLEEP', pct: sleepPct },
+        { label: 'RETURN', pct: returnPct },
+      ].sort((a, b) => b.pct - a.pct);
+
+      for (const v of verdicts) {
+        items.push({ type: 'row', label: v.label, value: `${v.pct}%`, cls: 'verdict-row' });
+      }
+
+      items.push({ type: 'dashed' });
+
+      const confLabel = conf < 40 ? 'Low' : conf < 70 ? 'Medium' : 'High';
+      items.push({ type: 'row', label: 'CONFIDENCE', value: confLabel });
+    }
+
+    items.push({ type: 'spacer' });
+    const footers = {
+      keep: 'Approved. Cut the tags.',
+      return: 'Your wallet thanks you.',
+      sleep_on_it: 'If it haunts you, it\'s a keep.',
+    };
+    const footer = footers[v?.choice] || '';
+    if (footer) {
+      items.push({ type: 'line', text: footer, cls: 'footer' });
+    }
+    items.push({ type: 'spacer' });
+
+    return items;
+  }
+
+  async function typeReceipt(items) {
+    resultsEl.innerHTML = '';
+    resultsEl.appendChild(stampEl);
+    resultsEl.classList.remove('ripping');
+    resultsEl.classList.add('visible');
+
+    for (const item of items) {
+      if (item.type === 'dashed') {
+        const hr = document.createElement('div');
+        hr.className = 'receipt-dashed';
+        if (item.scissors) {
+          hr.innerHTML = '<span style="position:absolute;top:50%;transform:translateY(-50%);left:-4px;font-size:28px;color:#1a1a1a;background:#ffffff;padding-right:6px;line-height:1;">✂</span>';
+        }
+        if (item.cutLine) {
+          hr.classList.add('cut-line');
+          hr.addEventListener('click', handleCut);
+        }
+        resultsEl.appendChild(hr);
+        await delay(40);
+        hr.classList.add('typed');
+        await delay(60);
+      } else if (item.type === 'image') {
+        const wrap = document.createElement('div');
+        wrap.className = 'receipt-image-wrap';
+        const img = document.createElement('img');
+        img.className = 'receipt-image';
+        img.src = item.src;
+        img.alt = 'Product';
+        img.onerror = () => wrap.style.display = 'none';
+        wrap.appendChild(img);
+        resultsEl.appendChild(wrap);
+        await delay(80);
+        wrap.classList.add('typed');
+        await delay(60);
+      } else if (item.type === 'row') {
+        const row = document.createElement('div');
+        row.className = 'receipt-row' + (item.cls ? ' ' + item.cls : '');
+        row.innerHTML = `<span class="row-label">${item.label}</span><span class="row-dots"></span><span class="row-value">${item.value}</span>`;
+        resultsEl.appendChild(row);
+        await delay(30);
+        row.classList.add('typed');
+        await delay(80);
+      } else if (item.type === 'spacer') {
+        const sp = document.createElement('div');
+        sp.style.height = '6px';
+        resultsEl.appendChild(sp);
+        await delay(20);
+      } else if (item.type === 'line') {
+        const el = document.createElement('div');
+        el.className = `receipt-line ${item.cls}`;
+
+        if (item.cls.includes('verdict-text')) {
+          el.textContent = item.text;
+          resultsEl.appendChild(el);
+          await delay(60);
+          el.classList.add('typed');
+          await delay(250);
+        } else {
+          el.textContent = item.text;
+          resultsEl.appendChild(el);
+          await delay(20);
+          el.classList.add('typed');
+          await delay(50);
+        }
+      }
+
+      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+    }
+  }
+
+  function delay(ms) {
+    return new Promise(r => setTimeout(r, ms));
+  }
+
+
+  async function runAnalysis() {
+    const val = inputEl.value.trim();
+    if (!val || val === lastAnalyzed || analyzing) return;
+
+    analyzing = true;
+    lastAnalyzed = val;
+
+    // Clear stamp and tear state — move elements back if needed
+    if (resultsEl.parentNode !== receiptEl) {
+      receiptEl.appendChild(resultsEl);
+    }
+    stampEl.className = 'receipt-stamp';
+    stampEl.style.opacity = '';
+    stampEl.style.transform = '';
+    stampEl.style.animation = '';
+    hintEl.classList.remove('rippable');
+    tearPaperEl.classList.remove('visible');
+    receiptEl.classList.remove('torn-off');
+    canRip = false;
+
+    if (resultsEl.classList.contains('visible')) {
+      resultsEl.classList.remove('visible');
+      resultsEl.classList.add('ripping');
+      await delay(500);
+      resultsEl.classList.remove('ripping');
+      resultsEl.innerHTML = '';
+    }
+
+    loadingEl.classList.add('visible');
+
+    const body = {};
+    const isUrl = /^https?:\/\/[^\s/$.?#].[^\s]*$/i.test(val.split('\n')[0].trim());
+
+    if (isUrl) {
+      const lines = val.split('\n');
+      body.type = 'link';
+      body.url = lines[0].trim();
+      body.notes = lines.slice(1).join('\n').trim();
+    } else if (val.length > 10) {
+      body.type = 'description';
+      body.description = val;
+    } else {
+      analyzing = false;
+      loadingEl.classList.remove('visible');
+      return;
+    }
+
+    try {
+      const resp = await fetch('/analyze', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+
+      const data = await resp.json();
+      if (data.error) throw new Error(data.error);
+
+      loadingEl.classList.remove('visible');
+      const items = buildReceipt(data);
+      const verdict = data.answers?.verdict;
+      await typeReceipt(items);
+      inputEl.blur();
+
+      // Stamp the verdict
+      if (verdict) {
+        const labels = { keep: 'KEEP', return: 'RETURN', sleep_on_it: 'SLEEP\nON IT' };
+        stampEl.className = `receipt-stamp ${verdict.choice}`;
+        stampEl.textContent = labels[verdict.choice] || verdict.choice;
+        await delay(300);
+        stampEl.classList.add('visible');
+        // Wait for animation to finish, then lock the final state
+        await delay(350);
+        stampEl.classList.remove('visible');
+        stampEl.style.opacity = '0.85';
+        stampEl.style.transform = 'translate(-50%, 0) rotate(-18deg) scale(1)';
+        stampEl.style.animation = 'none';
+      }
+
+      // Enable scissor cut (click the dashed cut line)
+      canRip = true;
+    } catch (e) {
+      hintEl.textContent = 'Error: ' + e.message;
+      loadingEl.classList.remove('visible');
+    } finally {
+      analyzing = false;
+    }
+  }
+
+  inputEl.addEventListener('input', () => {
+    inputEl.style.height = 'auto';
+    inputEl.style.height = inputEl.scrollHeight + 'px';
+    const val = inputEl.value.trim();
+    clearTimeout(debounceTimer);
+
+    if (!val) {
+      hintEl.textContent = '';
+      lastAnalyzed = '';
+      inputEl.classList.remove('detected');
+      return;
+    }
+
+    if (/^https?:\/\//i.test(val)) {
+      inputEl.classList.add('detected');
+      debounceTimer = setTimeout(runAnalysis, 300);
+    } else {
+      inputEl.classList.remove('detected');
+      debounceTimer = setTimeout(runAnalysis, 1500);
+    }
+  });
+
+  inputEl.addEventListener('paste', () => {
+    clearTimeout(debounceTimer);
+    setTimeout(() => {
+      if (/^https?:\/\//i.test(inputEl.value.trim())) {
+        inputEl.classList.add('detected');
+      }
+      inputEl.style.height = 'auto';
+      inputEl.style.height = inputEl.scrollHeight + 'px';
+    }, 0);
+    debounceTimer = setTimeout(runAnalysis, 400);
+  });
+
+  // Click-to-rip
+  function handleCut() {
+    if (!canRip) return;
+    canRip = false;
+
+    // Measure where the results are on screen
+    const receiptRect = receiptEl.getBoundingClientRect();
+    const resultsRect = resultsEl.getBoundingClientRect();
+    const startTop = resultsRect.top;
+
+    // Create a paper piece that will fall
+    const paper = document.createElement('div');
+    paper.style.position = 'fixed';
+    paper.style.top = startTop + 'px';
+    paper.style.left = receiptRect.left + 'px';
+    paper.style.width = receiptRect.width + 'px';
+    paper.style.minHeight = (receiptRect.bottom - resultsRect.top) + 'px';
+    paper.style.background = '#ffffff';
+    paper.style.padding = '0 24px 20px';
+    paper.style.zIndex = '50';
+    paper.style.filter = 'url(#paper-crinkle)';
+    paper.style.overflow = 'visible';
+
+    // Add zigzag torn top edge
+    const zigzag = document.createElement('div');
+    zigzag.style.cssText = 'position:absolute;top:-10px;left:0;right:0;height:10px;background:linear-gradient(135deg,transparent 50%,#ffffff 50%),linear-gradient(-135deg,transparent 50%,#ffffff 50%);background-size:10px 100%;';
+    paper.appendChild(zigzag);
+
+    // Add zigzag bottom edge
+    const zigzagBot = document.createElement('div');
+    zigzagBot.style.cssText = 'position:absolute;bottom:-10px;left:0;right:0;height:10px;background:linear-gradient(45deg,transparent 50%,#ffffff 50%),linear-gradient(-45deg,transparent 50%,#ffffff 50%);background-size:10px 100%;';
+    paper.appendChild(zigzagBot);
+
+    // Move actual resultsEl into paper (preserves animation states)
+    paper.appendChild(resultsEl);
+    document.body.appendChild(paper);
+
+    // Cut the receipt short and show torn zigzag edge
+    receiptEl.classList.add('torn-off', 'ripping');
+
+    // JS-driven fall animation
+    const startTime = performance.now();
+    const duration = 2000;
+    const totalDist = window.innerHeight + 200;
+
+    function fall(now) {
+      const elapsed = now - startTime;
+      const t = Math.min(elapsed / duration, 1);
+      // Ease in (accelerating like gravity)
+      const eased = t * t;
+      const y = startTop + eased * totalDist;
+      const rot = eased * 1;
+      paper.style.top = y + 'px';
+      paper.style.transform = 'rotate(' + rot + 'deg)';
+
+      if (t < 1) {
+        requestAnimationFrame(fall);
+      } else {
+        // Clean up
+        receiptEl.appendChild(resultsEl);
+        resultsEl.classList.remove('visible');
+        resultsEl.innerHTML = '';
+        resultsEl.appendChild(stampEl);
+        stampEl.className = 'receipt-stamp';
+        stampEl.style.opacity = '';
+        stampEl.style.transform = '';
+        stampEl.style.animation = '';
+        paper.remove();
+        receiptEl.classList.remove('torn-off', 'ripping');
+        inputEl.value = '';
+        inputEl.style.height = '';
+        inputEl.classList.remove('detected');
+        lastAnalyzed = '';
+        inputEl.focus();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }
+
+    requestAnimationFrame(fall);
+  }
+</script>
+
+</body>
+</html>
