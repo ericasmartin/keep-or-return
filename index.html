@@ -72,7 +72,7 @@
   /* Receipt */
   .receipt {
     background: #ffffff;
-    padding: 40px 24px 20px;
+    padding: 40px 24px 40px;
     position: relative;
     overflow: visible;
     filter: drop-shadow(0 1px 3px rgba(0,0,0,0.08)) drop-shadow(0 4px 12px rgba(0,0,0,0.1))
@@ -173,7 +173,7 @@
     font-weight: 400;
     border: none;
     background: transparent;
-    color: #949494;
+    color: #1a1a1a;
     outline: none;
     min-height: 38px;
     resize: none;
@@ -182,15 +182,7 @@
   }
 
   .receipt-input textarea::placeholder {
-    color: #bbb;
-  }
-
-  .receipt-input textarea {
-    transition: color 0.8s ease 0.4s;
-  }
-
-  .receipt-input textarea.detected {
-    color: #1a1a1a;
+    color: #949494;
   }
 
   .input-hint {
@@ -273,8 +265,7 @@
   }
 
   .receipt-row.verdict-row {
-    font-size: 14px;
-    font-weight: 700;
+    font-size: 12px;
   }
 
   /* Centered text */
@@ -289,7 +280,7 @@
 
   .receipt-line.desc-line {
     font-size: 12px;
-    color: #999;
+    color: #1a1a1a;
     text-align: left;
     line-height: 1.5;
     white-space: normal;
@@ -371,7 +362,7 @@
     left: 50%;
     transform: translate(-50%, 0) rotate(-18deg) scale(0);
     font-family: var(--sans);
-    font-size: 96px;
+    font-size: 88px;
     font-weight: 700;
     letter-spacing: -2px;
     line-height: 0.9;
@@ -897,7 +888,6 @@
         receiptEl.classList.remove('torn-off', 'ripping');
         inputEl.value = '';
         inputEl.style.height = '';
-        inputEl.classList.remove('detected');
         lastAnalyzed = '';
         inputEl.focus();
         window.scrollTo({ top: 0, behavior: 'smooth' });
