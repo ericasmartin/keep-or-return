@@ -2,6 +2,8 @@
 
 A receipt-style concept that helps you decide whether to keep or return a fashion purchase. I built this to play with Jev.
 
+![Keep or Return demo](keep-or-return.gif)
+
 Paste a product link or describe an item and it scores it across five dimensions:
 
 - **Cost Per Wear** — how often you'd realistically wear it
