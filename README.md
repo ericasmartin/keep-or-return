@@ -1,6 +1,6 @@
 # Keep or Return?
 
-A receipt-style web app that helps you decide whether to keep or return a fashion purchase. I built this to play with Jev.
+A receipt-style concept that helps you decide whether to keep or return a fashion purchase. I built this to play with Jev.
 
 Paste a product link or describe an item and it scores it across five dimensions:
 

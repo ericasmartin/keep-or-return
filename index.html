@@ -349,7 +349,7 @@
   .receipt-dashed.cut-line {
     cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Ctext y='18' font-size='18'%3E✂%3C/text%3E%3C/svg%3E") 12 12, pointer;
     height: 24px;
-    margin: 10px 0;
+    margin: 4px 0 10px;
     background-position: center;
     background-size: 100% 1.5px;
     background-repeat: no-repeat;
@@ -438,12 +438,12 @@
   /* When tear handle is shown, hide receipt zigzag (handle provides it) */
   .receipt.torn-off::after { display: none; }
   .receipt.torn-off {
-    padding-bottom: 0;
+    padding-bottom: 20px;
   }
 
   /* When actively dragging, show jagged tear on receipt bottom */
   .receipt.ripping {
-    padding-bottom: 0;
+    padding-bottom: 20px;
   }
   .receipt.ripping::after {
     display: block !important;
