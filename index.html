@@ -776,8 +776,9 @@
       // Enable scissor cut (click the dashed cut line)
       canRip = true;
     } catch (e) {
-      hintEl.textContent = 'Error: ' + e.message;
-      loadingEl.classList.remove('visible');
+      loadingEl.textContent = 'Error';
+      loadingEl.style.color = '#1a1a1a';
+      setTimeout(() => { loadingEl.style.color = ''; loadingEl.textContent = 'Printing...'; loadingEl.classList.remove('visible'); }, 3000);
     } finally {
       analyzing = false;
     }
