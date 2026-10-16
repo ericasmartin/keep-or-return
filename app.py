@@ -173,18 +173,6 @@ class Handler(SimpleHTTPRequestHandler):
             self.end_headers()
             with open(os.path.join(base, "index.html"), "rb") as f:
                 self.wfile.write(f.read())
-        elif self.path.startswith("/fonts/") and self.path.endswith(".woff2"):
-            font_path = os.path.join(base, self.path.lstrip("/"))
-            if os.path.exists(font_path):
-                self.send_response(200)
-                self.send_header("Content-Type", "font/woff2")
-                self.send_header("Cache-Control", "public, max-age=31536000")
-                self.end_headers()
-                with open(font_path, "rb") as f:
-                    self.wfile.write(f.read())
-            else:
-                self.send_response(404)
-                self.end_headers()
         else:
             super().do_GET()
 

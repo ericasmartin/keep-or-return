@@ -1,8 +1,10 @@
 # Keep or Return?
 
-A receipt-style concept that helps you decide whether to keep or return a fashion purchase. I built this to play with Jev.
+Paste a link, get a receipt, and find out if it's a keep. I built this to play with Jev.
 
 ![Keep or Return demo](keep-or-return.gif)
+
+## How it works
 
 Paste a product link or describe an item and it scores it across five dimensions:
 
@@ -14,6 +16,8 @@ Paste a product link or describe an item and it scores it across five dimensions
 
 Then gives you a verdict: **Keep**, **Return**, or **Sleep On It**.
 
+Could be expanded with vision to analyze product images directly.
+
 ## Setup
 
 ```
@@ -22,4 +26,7 @@ cp .env.example .env
 python3 app.py
 ```
 
-Runs at `http://localhost:8899`
+
+---
+
+Font: [Monument Grotesk](https://abcdinamo.com/typefaces/monument-grotesk) by ABC Dinamo (not included).
